@@ -1,4 +1,4 @@
-# integral-calculus-assignment
+# integral-calculus
 
 ## Visualization
 
@@ -17,7 +17,7 @@
 
 ``` cmd
 
-git clone https://github.com/CedricDeVon/integral-calculus-assignment.git
+git clone https://github.com/CedricDeVon/integral-calculus.git
 
 ```
 
