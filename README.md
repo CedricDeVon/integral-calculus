@@ -1,5 +1,9 @@
 # integral-calculus-assignment
 
+## Visualization
+
+![Data Analysis](./data.gif)
+
 ## Pre-requisites
 
 - pip (version 24.0 or higher)
