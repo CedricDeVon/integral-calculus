@@ -3,92 +3,86 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 if __name__ == '__main__':
-    t_vals = np.linspace(0, 1, 100)
-    x_true = t_vals**2
-    x_discrete = 2 * t_vals
-    x_integrated = 1 * t_vals
-    wall_x = 1.0
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 8))
+    total_frames = 30
+    t_values = np.linspace(0, 1, total_frames)
+
+    true_displacement = t_values**2
+    discrete_displacement = 2 * t_values
+    integrated_displacement = 1 * t_values
+    wall_position = 1.0
+
+    fig, (ax_time, ax_sim) = plt.subplots(2, 1, figsize=(8, 8))
     plt.subplots_adjust(hspace=0.5)
 
-    ax1.set_xlim(0, 1)
-    ax1.set_ylim(0, 2.2)
-    ax1.set_xlabel("Time (Seconds)")
-    ax1.set_ylabel("Displacement (Meters)")
-    ax1.set_title("Entity Displacement: Discrete vs Integration")
-    ax1.grid(True, linestyle="--", alpha=0.7)
+    fig.canvas.manager.set_window_title("Visualization")
 
-    ax1.plot(t_vals, x_true, label="True Displacement",
-             color="blue", linewidth=2)
-    ax1.plot(t_vals, x_discrete, label="Discreted Average",
-             color="orange", linestyle="--", linewidth=1.8)
-    ax1.plot(t_vals, x_integrated, label="Integrated Average",
-             color="red", linestyle=":", linewidth=1.8)
-    ax1.legend(fontsize=9, loc="upper left")
+    ax_time.set_xlim(0, total_frames)
+    ax_time.set_ylim(0, 2.2)
+    ax_time.set_xlabel("Frame Number (t)")
+    ax_time.set_ylabel("Displacement In Meters (y)")
+    ax_time.set_title("Entity Displacement (30 FPS)")
+    ax_time.grid(True, linestyle="--", alpha=0.7)
 
-    ax1.text(0.55, 0.1,
-        r"$x(t) = t^2$",
-        fontsize=10, color="blue",
-        ha="left", va="bottom")
-    ax1.text(0.50, 1.5,
-        r"$x_{n+1} = x_n + v(t_n)\Delta t$",
-        fontsize=10, color="orange",
-        ha="left", va="bottom")
-    ax1.text(0.55, 0.7,
-        r"$\bar{v} = \frac{1}{1-0}\int_0^1 2\tau \, d\tau$",
-        fontsize=10, color="red",
-        ha="left", va="bottom")
+    ax_time.plot(range(total_frames), true_displacement, label="True Displacement",
+                 color="blue", linewidth=1)
+    ax_time.plot(range(total_frames), discrete_displacement, label="Discrete Approximation",
+                 color="red", linestyle="--", linewidth=1)
+    ax_time.plot(range(total_frames), integrated_displacement, label="Integrated Average",
+                 color="green", linestyle=":", linewidth=1)
+    ax_time.axhline(y=wall_position, color="black", linestyle="-", linewidth=2, label="Wall at y=1")
+    ax_time.legend(fontsize=9, loc="upper left")
 
-    true_car1, = ax1.plot([], [], 'o', color="blue", markersize=10)
-    discrete_car1, = ax1.plot([], [], 'o', color="orange", markersize=10)
-    integrated_car1, = ax1.plot([], [], 'o', color="red", markersize=10)
+    ax_time.text(20, 0.1, r"$y = t^2$", fontsize=10, color="blue")
+    ax_time.text(10, 1.5, r"$y_{n+1} = y_n + v(t_n)\Delta t$", fontsize=10, color="red")
+    ax_time.text(15, 0.7, r"$y = \frac{1}{1-0} \int_0^2 2\tau d\tau$", fontsize=10, color="green")
 
-    ax2.set_xlim(0, 2.2)
-    ax2.set_ylim(-0.5, 0.5)
-    ax2.set_yticks([])
-    ax2.set_xlabel("Displacement (Meters)")
-    ax2.set_title("Entity Movement Simulation: Discrete vs Integration")
+    marker_true_time, = ax_time.plot([], [], 'o', color="blue", markersize=5)
+    marker_discrete_time, = ax_time.plot([], [], 'o', color="red", markersize=5)
+    marker_integrated_time, = ax_time.plot([], [], 'o', color="green", markersize=5)
 
-    ax2.axvline(x=wall_x, color="black", linestyle="--", linewidth=2, label="Wall at x=1")
+    ax_sim.set_xlim(0, 2.2)
+    ax_sim.set_ylim(-0.5, 0.5)
+    ax_sim.set_yticks([])
+    ax_sim.set_xlabel("Displacement In Meters (x)")
+    ax_sim.set_title("Entity Movement Simulation (30 FPS)")
+    
+    marker_true_sim, = ax_sim.plot([], [], 'o', color="blue", markersize=5, label="True Displacement")
+    marker_discrete_sim, = ax_sim.plot([], [], 'o', color="red", markersize=5, label="Discrete Approximation")
+    marker_integrated_sim, = ax_sim.plot([], [], 'o', color="green", markersize=5, label="Integrated Average")
+    ax_sim.axvline(x=wall_position, color="black", linestyle="-", linewidth=2, label="Wall at x=1")
+    ax_sim.grid(True, linestyle="--", alpha=0.7)
 
-    true_car2, = ax2.plot([], [], 'o', color="blue", markersize=10, label="True Displacement")
-    discrete_car2, = ax2.plot([], [], 'o', color="orange", markersize=10, label="Discreted Average")
-    integrated_car2, = ax2.plot([], [], 'o', color="red", markersize=10, label="Integrated Average")
-
-    ax2.legend(loc="upper right")
+    ax_sim.legend(loc="upper right")
 
     def init():
-        true_car1.set_data([], [])
-        discrete_car1.set_data([], [])
-        integrated_car1.set_data([], [])
-
-        true_car2.set_data([], [])
-        discrete_car2.set_data([], [])
-        integrated_car2.set_data([], [])
-        return true_car1, discrete_car1, integrated_car1, true_car2, discrete_car2, integrated_car2
+        marker_true_time.set_data([], [])
+        marker_discrete_time.set_data([], [])
+        marker_integrated_time.set_data([], [])
+        marker_true_sim.set_data([], [])
+        marker_discrete_sim.set_data([], [])
+        marker_integrated_sim.set_data([], [])
+        return (marker_true_time, marker_discrete_time, marker_integrated_time,
+                marker_true_sim, marker_discrete_sim, marker_integrated_sim)
 
     def update(frame):
-        t = t_vals[frame]
+        x_true_pos = min(true_displacement[frame], wall_position)
+        x_discrete_pos = discrete_displacement[frame]
+        x_integrated_pos = min(integrated_displacement[frame], wall_position)
 
-        true_car1.set_data([t], [x_true[frame]])
-        discrete_car1.set_data([t], [x_discrete[frame]])
-        integrated_car1.set_data([t], [x_integrated[frame]])
+        marker_true_time.set_data([frame], [x_true_pos])
+        marker_discrete_time.set_data([frame], [x_discrete_pos])
+        marker_integrated_time.set_data([frame], [x_integrated_pos])
 
-        xt = min(x_true[frame], wall_x)
-        true_car2.set_data([xt], [0.2])
+        marker_true_sim.set_data([x_true_pos], [0.2])
+        marker_discrete_sim.set_data([x_discrete_pos], [0])
+        marker_integrated_sim.set_data([x_integrated_pos], [-0.2])
 
-        xd = x_discrete[frame]
-        discrete_car2.set_data([xd], [0])
+        return (marker_true_time, marker_discrete_time, marker_integrated_time,
+                marker_true_sim, marker_discrete_sim, marker_integrated_sim)
 
-        xi = min(x_integrated[frame], wall_x)
-        integrated_car2.set_data([xi], [-0.2])
-
-        return true_car1, discrete_car1, integrated_car1, true_car2, discrete_car2, integrated_car2
-
-    ani = animation.FuncAnimation(
-        fig, update, frames=len(t_vals),
-        init_func=init, blit=True, interval=50
+    animation_obj = animation.FuncAnimation(
+        fig, update, frames=total_frames,
+        init_func=init, blit=True, interval=150
     )
 
-    ani.save("data.gif", writer="pillow", fps=60)
     plt.show()
