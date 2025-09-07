@@ -85,4 +85,6 @@ if __name__ == '__main__':
         init_func=init, blit=True, interval=150
     )
 
+    animation_obj.save("data.gif", writer="pillow", fps=5)
+
     plt.show()
