@@ -27,6 +27,8 @@ git clone https://github.com/CedricDeVon/integral-calculus.git
 
 python -m venv .
 
+Scripts/activate
+
 pip install numpy matplotlib
 
 ```
